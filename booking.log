@@ -1,0 +1,72 @@
+13:37:04 [INFO] ==================================================
+13:37:04 [INFO] 예약 시작
+13:37:04 [INFO]   열차   : SRT
+13:37:04 [INFO]   구간   : 수서 → 울산
+13:37:04 [INFO]   일시   : 2026-03-27 12:00 이후
+13:37:04 [INFO]   좌석   : 일반실 / 성인 1명
+13:37:04 [INFO]   자동결제: OFF
+13:37:04 [INFO] ==================================================
+13:37:04 [ERROR] SRTrain 패키지가 설치되지 않았습니다: pip install SRTrain
+13:37:04 [ERROR] 예약에 실패했습니다.
+13:38:03 [INFO] ==================================================
+13:38:03 [INFO] 예약 시작
+13:38:03 [INFO]   열차   : SRT
+13:38:03 [INFO]   구간   : 수서 → 경주
+13:38:03 [INFO]   일시   : 2026-03-27 11:00 이후
+13:38:03 [INFO]   좌석   : 일반실 / 성인 1명
+13:38:03 [INFO]   자동결제: OFF
+13:38:03 [INFO] ==================================================
+13:38:03 [ERROR] SRTrain 패키지가 설치되지 않았습니다: pip install SRTrain
+13:38:03 [ERROR] 예약에 실패했습니다.
+13:40:52 [INFO] ==================================================
+13:40:52 [INFO] 예약 시작
+13:40:52 [INFO]   열차   : SRT
+13:40:52 [INFO]   구간   : 수서 → 경주
+13:40:52 [INFO]   일시   : 2026-03-27 11:00 이후
+13:40:52 [INFO]   좌석   : 일반실 / 성인 1명
+13:40:52 [INFO]   자동결제: OFF
+13:40:52 [INFO] ==================================================
+13:40:52 [ERROR] .env 파일에 SRT_ID / SRT_PW 를 설정하세요.
+13:40:52 [ERROR] 예약에 실패했습니다.
+13:43:30 [INFO] ==================================================
+13:43:30 [INFO] 예약 시작
+13:43:30 [INFO]   열차   : SRT
+13:43:30 [INFO]   구간   : 수서 → 경주
+13:43:30 [INFO]   일시   : 2026-03-27 11:00 이후
+13:43:30 [INFO]   좌석   : 일반실 / 성인 1명
+13:43:30 [INFO]   자동결제: OFF
+13:43:30 [INFO] ==================================================
+13:43:30 [INFO] SRT 로그인 중...
+13:45:52 [INFO] ==================================================
+13:45:52 [INFO] 예약 시작
+13:45:52 [INFO]   열차   : SRT
+13:45:52 [INFO]   구간   : 수서 → 경주
+13:45:52 [INFO]   일시   : 2026-03-27 11:00 이후
+13:45:52 [INFO]   좌석   : 일반실 / 성인 1명
+13:45:52 [INFO]   자동결제: OFF
+13:45:52 [INFO] ==================================================
+13:45:52 [INFO] SRT 로그인 중...
+13:45:52 [INFO] [시도 1] 수서 → 경주 | 20260327 11:00
+13:45:52 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:45:57 [INFO] [시도 2] 수서 → 경주 | 20260327 11:00
+13:45:58 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:03 [INFO] [시도 3] 수서 → 경주 | 20260327 11:00
+13:46:03 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:08 [INFO] [시도 4] 수서 → 경주 | 20260327 11:00
+13:46:09 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:14 [INFO] [시도 5] 수서 → 경주 | 20260327 11:00
+13:46:14 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:19 [INFO] [시도 6] 수서 → 경주 | 20260327 11:00
+13:46:20 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:25 [INFO] [시도 7] 수서 → 경주 | 20260327 11:00
+13:46:25 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:30 [INFO] [시도 8] 수서 → 경주 | 20260327 11:00
+13:46:31 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:36 [INFO] [시도 9] 수서 → 경주 | 20260327 11:00
+13:46:36 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:41 [INFO] [시도 10] 수서 → 경주 | 20260327 11:00
+13:46:41 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:46 [INFO] [시도 11] 수서 → 경주 | 20260327 11:00
+13:46:47 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
+13:46:52 [INFO] [시도 12] 수서 → 경주 | 20260327 11:00
+13:46:52 [WARNING] 오류 발생: 'SRTTrain' object has no attribute 'special_seat'
