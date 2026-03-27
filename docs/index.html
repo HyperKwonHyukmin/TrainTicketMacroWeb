@@ -152,6 +152,18 @@
 
   <form id="form">
 
+    <!-- GitHub PAT 설정 (처음 1회 또는 재설정 시) -->
+    <div class="card" id="patCard">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>GitHub 토큰 설정</span>
+        <span id="patStatus" style="font-size:0.75rem;font-weight:600;"></span>
+      </div>
+      <label>Personal Access Token (Classic)</label>
+      <input type="password" id="pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" />
+      <p class="hint" id="patHint">repo + workflow 권한 필요</p>
+      <button type="button" id="savePat" onclick="savePat()" style="margin-top:10px;width:100%;padding:10px;background:#f3f4f6;border:1.5px solid #d1d5db;border-radius:10px;font-size:0.9rem;font-weight:600;color:#374151;cursor:pointer;">저장</button>
+    </div>
+
     <!-- SRT 계정 -->
     <div class="card">
       <div class="card-title">SRT 계정</div>
@@ -235,7 +247,39 @@
     const OWNER    = "HyperKwonHyukmin";
     const REPO     = "TrainTicketMacroWeb";
     const WORKFLOW = "srt_booking.yml";
-    const PAT      = "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";
+    // PAT 상태 초기화
+    function initPat() {
+      const saved = localStorage.getItem("srt_github_pat");
+      const card  = document.getElementById("patCard");
+      const status = document.getElementById("patStatus");
+      const hint   = document.getElementById("patHint");
+      if (saved) {
+        card.style.background = "#f0fdf4";
+        card.style.border = "1.5px solid #6ee7b7";
+        status.textContent = "✅ 저장됨";
+        status.style.color = "#065f46";
+        hint.innerHTML = '저장된 토큰 사용 중 · <span style="color:#1a56db;cursor:pointer;" onclick="clearPat()">삭제</span>';
+        document.getElementById("pat").placeholder = "새 토큰으로 교체하려면 입력";
+      } else {
+        status.textContent = "미설정";
+        status.style.color = "#9ca3af";
+      }
+    }
+
+    function savePat() {
+      const val = document.getElementById("pat").value.trim();
+      if (!val) { alert("토큰을 입력하세요."); return; }
+      localStorage.setItem("srt_github_pat", val);
+      document.getElementById("pat").value = "";
+      initPat();
+    }
+
+    function clearPat() {
+      localStorage.removeItem("srt_github_pat");
+      initPat();
+    }
+
+    initPat();
 
     // 내일 날짜 기본값
     const today = new Date();
@@ -260,6 +304,12 @@
 
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const PAT = localStorage.getItem("srt_github_pat");
+      if (!PAT) {
+        showStatus("error", "❌ GitHub 토큰이 설정되지 않았습니다.<br>위의 <strong>GitHub 토큰 설정</strong> 칸에 토큰을 입력하고 저장하세요.");
+        return;
+      }
 
       const srt_id         = document.getElementById("srt_id").value.trim();
       const srt_pw         = document.getElementById("srt_pw").value;
