@@ -33,6 +33,7 @@ def run(
     destination: str,
     date: str,
     time_str: str,
+    end_time_str: str = "",
     adult: int = 1,
     seat_type: str = "일반실",
     retry_interval: int = 5,
@@ -83,7 +84,10 @@ def run(
             return False
 
         attempt += 1
-        logger.info(f"[SRT 시도 {attempt}] {departure} → {destination} | {date} {time_str[:2]}:{time_str[2:4]}")
+        time_range = f"{time_str[:2]}:{time_str[2:4]}"
+        if end_time_str:
+            time_range += f" ~ {end_time_str[:2]}:{end_time_str[2:4]}"
+        logger.info(f"[SRT 시도 {attempt}] {departure} → {destination} | {date} {time_range}")
 
         try:
             trains = srt.search_train(
@@ -102,6 +106,18 @@ def run(
                         f"  {train.train_name} {train.dep_time}→{train.arr_time} "
                         f"| 특실: {train.special_seat_state} / 일반: {train.general_seat_state}"
                     )
+
+                # 종료 시간 필터링
+                end_hhmm = end_time_str[:2] + ":" + end_time_str[2:4] if end_time_str else ""
+                if end_hhmm:
+                    trains = [t for t in trains if t.dep_time[:5] <= end_hhmm]
+                    if not trains:
+                        logger.info(f"지정 시간대({time_range}) 내 열차 없음. 재시도 대기...")
+                        if max_retry and attempt >= max_retry:
+                            logger.error(f"최대 재시도 횟수({max_retry}) 초과. 종료합니다.")
+                            return False
+                        time.sleep(retry_interval)
+                        continue
 
                 # 예약 가능한 열차 선택
                 for train in trains:

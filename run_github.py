@@ -19,20 +19,25 @@ logging.basicConfig(
 import srt_macro
 
 # ── 환경 변수에서 파라미터 읽기 ─────────────────────────────────────────────
-departure     = os.environ["DEPARTURE"]
-destination   = os.environ["DESTINATION"]
-date          = os.environ["DATE"]
-time_str      = os.environ["TIME"]
-adult         = int(os.environ.get("ADULT", "1"))
-seat_type     = os.environ.get("SEAT_TYPE", "일반실")
+departure      = os.environ["DEPARTURE"]
+destination    = os.environ["DESTINATION"]
+date           = os.environ["DATE"]
+time_str       = os.environ["TIME"]
+end_time_str   = os.environ.get("END_TIME", "")
+adult          = int(os.environ.get("ADULT", "1"))
+seat_type      = os.environ.get("SEAT_TYPE", "일반실")
 retry_interval = int(os.environ.get("RETRY_INTERVAL", "5"))
-max_retry     = int(os.environ.get("MAX_RETRY", "0"))
+max_retry      = int(os.environ.get("MAX_RETRY", "0"))
+
+time_range = f"{time_str[:2]}:{time_str[2:4]}"
+if end_time_str:
+    time_range += f" ~ {end_time_str[:2]}:{end_time_str[2:4]}"
 
 logging.info("=" * 50)
 logging.info("SRT 자동 예매 시작")
 logging.info(f"  노선     : {departure} → {destination}")
 logging.info(f"  날짜     : {date}")
-logging.info(f"  최소시간 : {time_str[:2]}:{time_str[2:4]}")
+logging.info(f"  시간대   : {time_range}")
 logging.info(f"  인원     : 성인 {adult}명")
 logging.info(f"  좌석     : {seat_type}")
 logging.info(f"  재시도   : {retry_interval}초 간격" + (f", 최대 {max_retry}회" if max_retry else ", 무제한"))
@@ -43,6 +48,7 @@ success = srt_macro.run(
     destination=destination,
     date=date,
     time_str=time_str,
+    end_time_str=end_time_str,
     adult=adult,
     seat_type=seat_type,
     retry_interval=retry_interval,

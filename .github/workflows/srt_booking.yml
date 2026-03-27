@@ -24,6 +24,10 @@ on:
         description: "최소 출발 시간 (HHMMSS, 예: 060000)"
         required: true
         default: "060000"
+      end_time:
+        description: "최대 출발 시간 (HHMMSS, 예: 100000) — 비워두면 제한 없음"
+        required: false
+        default: ""
       adult:
         description: "성인 인원 수"
         required: true
@@ -77,6 +81,7 @@ jobs:
           DESTINATION: ${{ github.event.inputs.destination }}
           DATE: ${{ github.event.inputs.date }}
           TIME: ${{ github.event.inputs.time }}
+          END_TIME: ${{ github.event.inputs.end_time }}
           ADULT: ${{ github.event.inputs.adult }}
           SEAT_TYPE: ${{ github.event.inputs.seat_type }}
           RETRY_INTERVAL: ${{ github.event.inputs.retry_interval }}
