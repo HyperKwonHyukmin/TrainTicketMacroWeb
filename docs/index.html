@@ -143,15 +143,6 @@
       font-weight: 600;
       text-decoration: none;
     }
-
-    .toggle-pat {
-      font-size: 0.8rem;
-      color: #1a56db;
-      cursor: pointer;
-      float: right;
-      font-weight: 600;
-      margin-top: -2px;
-    }
   </style>
 </head>
 <body>
@@ -160,22 +151,6 @@
   <p class="subtitle">GitHub Actions로 자동 예매를 시작합니다</p>
 
   <form id="form">
-
-    <!-- GitHub 설정 -->
-    <div class="card">
-      <div class="card-title">GitHub 설정</div>
-
-      <label>
-        GitHub Personal Access Token
-        <span class="toggle-pat" onclick="togglePat()">보기</span>
-      </label>
-      <input type="password" id="pat" placeholder="ghp_xxxxxxxxxxxx" required />
-      <p class="hint">repo / workflow 권한 필요 · <a href="https://github.com/settings/tokens" target="_blank" style="color:#1a56db">발급하기</a></p>
-      <label style="flex-direction:row; display:flex; align-items:center; gap:8px; margin-top:10px; font-weight:500; color:#6b7280;">
-        <input type="checkbox" id="rememberPat" style="width:auto; margin:0;" />
-        이 기기에 토큰 저장 (다음에 자동 입력)
-      </label>
-    </div>
 
     <!-- SRT 계정 -->
     <div class="card">
@@ -213,7 +188,7 @@
         </div>
         <div>
           <label>최대 출발 시간</label>
-          <input type="time" id="end_time" placeholder="제한 없음" />
+          <input type="time" id="end_time" />
           <p class="hint">비우면 제한 없음</p>
         </div>
       </div>
@@ -257,37 +232,22 @@
   <div id="status"></div>
 
   <script>
-    const OWNER = "HyperKwonHyukmin";
-    const REPO  = "TrainTicketMacroWeb";
+    const OWNER    = "HyperKwonHyukmin";
+    const REPO     = "TrainTicketMacroWeb";
     const WORKFLOW = "srt_booking.yml";
+    const PAT      = "여기에_발급받은_토큰_붙여넣기";  // ← Fine-grained PAT 입력
 
-    // 저장된 PAT 불러오기
-    const savedPat = localStorage.getItem("srt_pat");
-    if (savedPat) {
-      document.getElementById("pat").value = savedPat;
-      document.getElementById("rememberPat").checked = true;
-    }
-
-    // 오늘 날짜 기본값
+    // 내일 날짜 기본값
     const today = new Date();
     today.setDate(today.getDate() + 1);
     document.getElementById("date").value = today.toISOString().split("T")[0];
 
-    function togglePat() {
-      const el = document.getElementById("pat");
-      const btn = document.querySelector(".toggle-pat");
-      if (el.type === "password") { el.type = "text"; btn.textContent = "숨기기"; }
-      else { el.type = "password"; btn.textContent = "보기"; }
-    }
-
     function toHHMMSS(timeVal) {
-      // "HH:MM" → "HHMMSS"
       if (!timeVal) return "";
       return timeVal.replace(":", "") + "00";
     }
 
     function toYYYYMMDD(dateVal) {
-      // "YYYY-MM-DD" → "YYYYMMDD"
       return dateVal.replace(/-/g, "");
     }
 
@@ -301,21 +261,17 @@
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const pat          = document.getElementById("pat").value.trim();
-      const rememberPat  = document.getElementById("rememberPat").checked;
-      if (rememberPat) localStorage.setItem("srt_pat", pat);
-      else localStorage.removeItem("srt_pat");
-      const srt_id       = document.getElementById("srt_id").value.trim();
-      const srt_pw       = document.getElementById("srt_pw").value;
-      const departure    = document.getElementById("departure").value.trim();
-      const destination  = document.getElementById("destination").value.trim();
-      const date         = toYYYYMMDD(document.getElementById("date").value);
-      const time         = toHHMMSS(document.getElementById("time").value);
-      const end_time     = toHHMMSS(document.getElementById("end_time").value);
-      const adult        = document.getElementById("adult").value;
-      const seat_type    = document.getElementById("seat_type").value;
+      const srt_id         = document.getElementById("srt_id").value.trim();
+      const srt_pw         = document.getElementById("srt_pw").value;
+      const departure      = document.getElementById("departure").value.trim();
+      const destination    = document.getElementById("destination").value.trim();
+      const date           = toYYYYMMDD(document.getElementById("date").value);
+      const time           = toHHMMSS(document.getElementById("time").value);
+      const end_time       = toHHMMSS(document.getElementById("end_time").value);
+      const adult          = document.getElementById("adult").value;
+      const seat_type      = document.getElementById("seat_type").value;
       const retry_interval = document.getElementById("retry_interval").value;
-      const max_retry    = document.getElementById("max_retry").value;
+      const max_retry      = document.getElementById("max_retry").value;
 
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
@@ -327,7 +283,7 @@
           {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${pat}`,
+              "Authorization": `Bearer ${PAT}`,
               "Accept": "application/vnd.github+json",
               "Content-Type": "application/json",
             },
@@ -354,8 +310,8 @@
         } else {
           const body = await res.json().catch(() => ({}));
           const msg = body.message || `HTTP ${res.status}`;
-          if (res.status === 401) throw new Error("PAT가 올바르지 않거나 만료됐습니다.");
-          if (res.status === 404) throw new Error("레포 또는 워크플로우를 찾을 수 없습니다. PAT 권한(workflow)을 확인하세요.");
+          if (res.status === 401) throw new Error("PAT가 만료됐거나 권한이 없습니다. 관리자에게 문의하세요.");
+          if (res.status === 404) throw new Error("워크플로우를 찾을 수 없습니다. 관리자에게 문의하세요.");
           throw new Error(msg);
         }
       } catch (err) {
