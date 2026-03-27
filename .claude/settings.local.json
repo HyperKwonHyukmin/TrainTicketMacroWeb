@@ -8,7 +8,12 @@
       "Bash(trainticketenv/Scripts/python.exe -c \"import srt; print\\(srt.__file__\\)\")",
       "Bash(trainticketenv/Scripts/python.exe -c \"from SRT import SRT; print\\(''SRT ok''\\)\")",
       "Bash(trainticketenv/Scripts/python.exe -c \":*)",
-      "Bash(trainticketenv/Scripts/python.exe -c \"from korail2 import Korail; print\\(''korail2 ok''\\)\")"
+      "Bash(trainticketenv/Scripts/python.exe -c \"from korail2 import Korail; print\\(''korail2 ok''\\)\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)"
     ]
   }
 }

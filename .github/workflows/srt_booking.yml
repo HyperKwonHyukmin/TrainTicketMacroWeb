@@ -3,6 +3,12 @@ name: SRT 자동 예매
 on:
   workflow_dispatch:
     inputs:
+      srt_id:
+        description: "SRT 아이디 (멤버십 번호 또는 이메일)"
+        required: true
+      srt_pw:
+        description: "SRT 비밀번호"
+        required: true
       departure:
         description: "출발역 (예: 수서, 동탄)"
         required: true
@@ -49,6 +55,11 @@ jobs:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
 
+      - name: 비밀번호 마스킹 (로그 보호)
+        run: |
+          echo "::add-mask::${{ github.event.inputs.srt_id }}"
+          echo "::add-mask::${{ github.event.inputs.srt_pw }}"
+
       - name: Python 설정
         uses: actions/setup-python@v5
         with:
@@ -60,8 +71,8 @@ jobs:
 
       - name: SRT 예매 실행
         env:
-          SRT_ID: ${{ secrets.SRT_ID }}
-          SRT_PW: ${{ secrets.SRT_PW }}
+          SRT_ID: ${{ github.event.inputs.srt_id }}
+          SRT_PW: ${{ github.event.inputs.srt_pw }}
           DEPARTURE: ${{ github.event.inputs.departure }}
           DESTINATION: ${{ github.event.inputs.destination }}
           DATE: ${{ github.event.inputs.date }}
