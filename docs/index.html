@@ -171,6 +171,10 @@
       </label>
       <input type="password" id="pat" placeholder="ghp_xxxxxxxxxxxx" required />
       <p class="hint">repo / workflow 권한 필요 · <a href="https://github.com/settings/tokens" target="_blank" style="color:#1a56db">발급하기</a></p>
+      <label style="flex-direction:row; display:flex; align-items:center; gap:8px; margin-top:10px; font-weight:500; color:#6b7280;">
+        <input type="checkbox" id="rememberPat" style="width:auto; margin:0;" />
+        이 기기에 토큰 저장 (다음에 자동 입력)
+      </label>
     </div>
 
     <!-- SRT 계정 -->
@@ -257,6 +261,13 @@
     const REPO  = "TrainTicketMacroWeb";
     const WORKFLOW = "srt_booking.yml";
 
+    // 저장된 PAT 불러오기
+    const savedPat = localStorage.getItem("srt_pat");
+    if (savedPat) {
+      document.getElementById("pat").value = savedPat;
+      document.getElementById("rememberPat").checked = true;
+    }
+
     // 오늘 날짜 기본값
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -291,6 +302,9 @@
       e.preventDefault();
 
       const pat          = document.getElementById("pat").value.trim();
+      const rememberPat  = document.getElementById("rememberPat").checked;
+      if (rememberPat) localStorage.setItem("srt_pat", pat);
+      else localStorage.removeItem("srt_pat");
       const srt_id       = document.getElementById("srt_id").value.trim();
       const srt_pw       = document.getElementById("srt_pw").value;
       const departure    = document.getElementById("departure").value.trim();
