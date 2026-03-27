@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRT 자동 예매</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #1a56db;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .card-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 5px;
+      margin-top: 12px;
+    }
+
+    label:first-of-type { margin-top: 0; }
+
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: #111827;
+      background: #f9fafb;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a56db;
+      background: #fff;
+    }
+
+    input[type="password"] { letter-spacing: 0.1em; }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .warning {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 15px;
+      background: #1a56db;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    button[type="submit"]:active { opacity: 0.85; }
+    button[type="submit"]:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    #status {
+      margin-top: 16px;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      display: none;
+    }
+
+    #status.success {
+      background: #ecfdf5;
+      border: 1.5px solid #6ee7b7;
+      color: #065f46;
+      display: block;
+    }
+
+    #status.error {
+      background: #fef2f2;
+      border: 1.5px solid #fca5a5;
+      color: #991b1b;
+      display: block;
+    }
+
+    #status a {
+      color: #1a56db;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .toggle-pat {
+      font-size: 0.8rem;
+      color: #1a56db;
+      cursor: pointer;
+      float: right;
+      font-weight: 600;
+      margin-top: -2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚄 SRT 자동 예매</h1>
+  <p class="subtitle">GitHub Actions로 자동 예매를 시작합니다</p>
+
+  <form id="form">
+
+    <!-- GitHub 설정 -->
+    <div class="card">
+      <div class="card-title">GitHub 설정</div>
+
+      <label>
+        GitHub Personal Access Token
+        <span class="toggle-pat" onclick="togglePat()">보기</span>
+      </label>
+      <input type="password" id="pat" placeholder="ghp_xxxxxxxxxxxx" required />
+      <p class="hint">repo / workflow 권한 필요 · <a href="https://github.com/settings/tokens" target="_blank" style="color:#1a56db">발급하기</a></p>
+    </div>
+
+    <!-- SRT 계정 -->
+    <div class="card">
+      <div class="card-title">SRT 계정</div>
+
+      <label>아이디 (멤버십 번호 또는 이메일)</label>
+      <input type="text" id="srt_id" placeholder="SRT 아이디" required autocomplete="off" />
+
+      <label>비밀번호</label>
+      <input type="password" id="srt_pw" placeholder="SRT 비밀번호" required autocomplete="off" />
+    </div>
+
+    <!-- 예매 정보 -->
+    <div class="card">
+      <div class="card-title">예매 정보</div>
+
+      <div class="row2">
+        <div>
+          <label>출발역</label>
+          <input type="text" id="departure" value="수서" required />
+        </div>
+        <div>
+          <label>도착역</label>
+          <input type="text" id="destination" value="부산" required />
+        </div>
+      </div>
+
+      <label>날짜</label>
+      <input type="date" id="date" required />
+
+      <div class="row2">
+        <div>
+          <label>최소 출발 시간</label>
+          <input type="time" id="time" value="06:00" required />
+        </div>
+        <div>
+          <label>최대 출발 시간</label>
+          <input type="time" id="end_time" placeholder="제한 없음" />
+          <p class="hint">비우면 제한 없음</p>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label>성인 인원</label>
+          <input type="number" id="adult" value="1" min="1" max="9" required />
+        </div>
+        <div>
+          <label>좌석 종류</label>
+          <select id="seat_type">
+            <option value="일반실">일반실</option>
+            <option value="특실">특실</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label>재시도 간격 (초)</label>
+          <input type="number" id="retry_interval" value="5" min="3" max="60" required />
+        </div>
+        <div>
+          <label>최대 재시도</label>
+          <input type="number" id="max_retry" value="0" min="0" />
+          <p class="hint">0 = 무제한</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 주의사항 -->
+    <div class="warning">
+      ⚠️ 예매 성공 후 <strong>SRT 앱/사이트에서 직접 결제</strong>하세요.<br>
+      결제 대기 시간이 짧으니 Actions 탭을 자주 확인하세요.
+    </div>
+
+    <button type="submit" id="submitBtn">예매 시작</button>
+  </form>
+
+  <div id="status"></div>
+
+  <script>
+    const OWNER = "HyperKwonHyukmin";
+    const REPO  = "TrainTicketMacroWeb";
+    const WORKFLOW = "srt_booking.yml";
+
+    // 오늘 날짜 기본값
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    document.getElementById("date").value = today.toISOString().split("T")[0];
+
+    function togglePat() {
+      const el = document.getElementById("pat");
+      const btn = document.querySelector(".toggle-pat");
+      if (el.type === "password") { el.type = "text"; btn.textContent = "숨기기"; }
+      else { el.type = "password"; btn.textContent = "보기"; }
+    }
+
+    function toHHMMSS(timeVal) {
+      // "HH:MM" → "HHMMSS"
+      if (!timeVal) return "";
+      return timeVal.replace(":", "") + "00";
+    }
+
+    function toYYYYMMDD(dateVal) {
+      // "YYYY-MM-DD" → "YYYYMMDD"
+      return dateVal.replace(/-/g, "");
+    }
+
+    function showStatus(type, html) {
+      const el = document.getElementById("status");
+      el.className = type;
+      el.innerHTML = html;
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const pat          = document.getElementById("pat").value.trim();
+      const srt_id       = document.getElementById("srt_id").value.trim();
+      const srt_pw       = document.getElementById("srt_pw").value;
+      const departure    = document.getElementById("departure").value.trim();
+      const destination  = document.getElementById("destination").value.trim();
+      const date         = toYYYYMMDD(document.getElementById("date").value);
+      const time         = toHHMMSS(document.getElementById("time").value);
+      const end_time     = toHHMMSS(document.getElementById("end_time").value);
+      const adult        = document.getElementById("adult").value;
+      const seat_type    = document.getElementById("seat_type").value;
+      const retry_interval = document.getElementById("retry_interval").value;
+      const max_retry    = document.getElementById("max_retry").value;
+
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.textContent = "요청 중...";
+
+      try {
+        const res = await fetch(
+          `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${pat}`,
+              "Accept": "application/vnd.github+json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ref: "main",
+              inputs: {
+                srt_id, srt_pw,
+                departure, destination,
+                date, time, end_time,
+                adult, seat_type,
+                retry_interval, max_retry,
+              },
+            }),
+          }
+        );
+
+        if (res.status === 204) {
+          showStatus("success",
+            `✅ <strong>예매 워크플로우가 시작됐습니다!</strong><br><br>` +
+            `아래 링크에서 실시간 로그를 확인하세요:<br>` +
+            `<a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank">` +
+            `github.com/${OWNER}/${REPO}/actions →</a>`
+          );
+        } else {
+          const body = await res.json().catch(() => ({}));
+          const msg = body.message || `HTTP ${res.status}`;
+          if (res.status === 401) throw new Error("PAT가 올바르지 않거나 만료됐습니다.");
+          if (res.status === 404) throw new Error("레포 또는 워크플로우를 찾을 수 없습니다. PAT 권한(workflow)을 확인하세요.");
+          throw new Error(msg);
+        }
+      } catch (err) {
+        showStatus("error", `❌ <strong>오류 발생</strong><br>${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "예매 시작";
+      }
+    });
+  </script>
+
+</body>
+</html>
