@@ -1,0 +1,73 @@
+name: SRT 자동 예매
+
+on:
+  workflow_dispatch:
+    inputs:
+      departure:
+        description: "출발역 (예: 수서, 동탄)"
+        required: true
+        default: "수서"
+      destination:
+        description: "도착역 (예: 부산, 동대구)"
+        required: true
+        default: "부산"
+      date:
+        description: "날짜 (YYYYMMDD, 예: 20260401)"
+        required: true
+      time:
+        description: "최소 출발 시간 (HHMMSS, 예: 060000)"
+        required: true
+        default: "060000"
+      adult:
+        description: "성인 인원 수"
+        required: true
+        default: "1"
+      seat_type:
+        description: "좌석 종류"
+        required: true
+        default: "일반실"
+        type: choice
+        options:
+          - 일반실
+          - 특실
+      retry_interval:
+        description: "재시도 간격 (초)"
+        required: true
+        default: "5"
+      max_retry:
+        description: "최대 재시도 횟수 (0 = 6시간 제한 내 무제한)"
+        required: true
+        default: "0"
+
+jobs:
+  book:
+    name: SRT 예매 실행
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # GitHub Actions 최대 6시간
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 의존성 설치
+        run: pip install SRTrain python-dotenv urllib3 requests
+
+      - name: SRT 예매 실행
+        env:
+          SRT_ID: ${{ secrets.SRT_ID }}
+          SRT_PW: ${{ secrets.SRT_PW }}
+          DEPARTURE: ${{ github.event.inputs.departure }}
+          DESTINATION: ${{ github.event.inputs.destination }}
+          DATE: ${{ github.event.inputs.date }}
+          TIME: ${{ github.event.inputs.time }}
+          ADULT: ${{ github.event.inputs.adult }}
+          SEAT_TYPE: ${{ github.event.inputs.seat_type }}
+          RETRY_INTERVAL: ${{ github.event.inputs.retry_interval }}
+          MAX_RETRY: ${{ github.event.inputs.max_retry }}
+        run: python run_github.py
