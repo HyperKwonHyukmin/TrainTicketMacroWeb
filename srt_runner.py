@@ -6,8 +6,22 @@ SRT 자동 예약 - 헤드리스 서버 실행용 (GitHub Actions)
 import os
 import sys
 import time
+import json
 import requests
 from datetime import datetime
+
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "booking_config.json")
+
+
+def load_file_config() -> dict:
+    """booking_config.json 읽기. 없으면 빈 딕셔너리 반환."""
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
 
 try:
     from SRT import SRT
@@ -47,22 +61,29 @@ def seat_available(train, seat_type_str: str) -> bool:
 
 
 def main():
-    # ── 환경변수에서 설정 읽기 ──────────────────────────────────────────────
-    srt_id       = os.environ.get("SRT_ID", "")
-    srt_pw       = os.environ.get("SRT_PW", "")
-    dep          = os.environ.get("DEP_STATION", "수서")
-    arr          = os.environ.get("ARR_STATION", "부산")
-    date         = os.environ.get("DATE", "")
-    start_raw    = os.environ.get("START_TIME", "00:00").replace(":", "")
-    end_raw      = os.environ.get("END_TIME", "23:59").replace(":", "")
-    start_time   = start_raw.ljust(6, "0")   # HHMMSS
-    end_time     = end_raw[:4] + "59"         # HHMMSS
-    passengers   = int(os.environ.get("PASSENGERS", "1"))
-    seat_type_str = os.environ.get("SEAT_TYPE", "GENERAL_FIRST")
-    interval_sec = int(os.environ.get("INTERVAL_SEC", "5"))
-    tg_token     = os.environ.get("TG_TOKEN", "")
-    tg_chat_id   = os.environ.get("TG_CHAT_ID", "")
-    max_duration = int(os.environ.get("MAX_DURATION_SEC", str(5 * 3600)))  # 기본 5시간
+    # ── 설정 파일 읽기 (기본값) ────────────────────────────────────────────
+    fc = load_file_config()
+
+    # ── 환경변수 우선, 없으면 설정 파일값 사용 ────────────────────────────
+    def get(env_key, file_key, default):
+        v = os.environ.get(env_key, "").strip()
+        return v if v else str(fc.get(file_key, default))
+
+    srt_id        = os.environ.get("SRT_ID", "").strip()
+    srt_pw        = os.environ.get("SRT_PW", "").strip()
+    dep           = get("DEP_STATION",  "dep_station",  "수서")
+    arr           = get("ARR_STATION",  "arr_station",  "부산")
+    date          = get("DATE",         "date",         "")
+    start_raw     = get("START_TIME",   "start_time",   "00:00").replace(":", "")
+    end_raw       = get("END_TIME",     "end_time",     "23:59").replace(":", "")
+    start_time    = start_raw.ljust(6, "0")
+    end_time      = end_raw[:4] + "59"
+    passengers    = int(get("PASSENGERS",   "passengers",   "1"))
+    seat_type_str = get("SEAT_TYPE",    "seat_type",    "GENERAL_FIRST")
+    interval_sec  = int(get("INTERVAL_SEC", "interval_sec", "5"))
+    tg_token      = os.environ.get("TG_TOKEN", "").strip()
+    tg_chat_id    = os.environ.get("TG_CHAT_ID", "").strip()
+    max_duration  = int(os.environ.get("MAX_DURATION_SEC", str(5 * 3600)))
 
     # ── 필수값 확인 ────────────────────────────────────────────────────────
     if not srt_id or not srt_pw:

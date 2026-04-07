@@ -4,42 +4,36 @@ on:
   workflow_dispatch:
     inputs:
       dep_station:
-        description: '출발역 (예: 수서)'
-        required: true
-        default: '수서'
+        description: '출발역 (비우면 booking_config.json 사용)'
+        required: false
       arr_station:
-        description: '도착역 (예: 부산)'
-        required: true
-        default: '부산'
+        description: '도착역 (비우면 booking_config.json 사용)'
+        required: false
       date:
-        description: '날짜 YYYYMMDD (예: 20260410)'
-        required: true
+        description: '날짜 YYYYMMDD (비우면 booking_config.json 사용)'
+        required: false
       start_time:
-        description: '시작 시간 HH:MM (예: 13:00)'
-        required: true
-        default: '00:00'
+        description: '시작 시간 HH:MM (비우면 booking_config.json 사용)'
+        required: false
       end_time:
-        description: '종료 시간 HH:MM (예: 20:00)'
-        required: true
-        default: '23:59'
+        description: '종료 시간 HH:MM (비우면 booking_config.json 사용)'
+        required: false
       passengers:
-        description: '인원 수 (1~9)'
-        required: true
-        default: '1'
+        description: '인원 수 (비우면 booking_config.json 사용)'
+        required: false
       seat_type:
-        description: '좌석 유형'
-        required: true
-        default: 'GENERAL_FIRST'
+        description: '좌석 유형 (비우면 booking_config.json 사용)'
+        required: false
         type: choice
         options:
+          - ''
           - GENERAL_FIRST
           - SPECIAL_FIRST
           - GENERAL_ONLY
           - SPECIAL_ONLY
       interval_sec:
-        description: '검색 간격 (초, 최소 1)'
-        required: true
-        default: '5'
+        description: '검색 간격 초 (비우면 booking_config.json 사용)'
+        required: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
