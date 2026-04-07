@@ -1,0 +1,78 @@
+name: SRT 자동 예약
+
+on:
+  workflow_dispatch:
+    inputs:
+      dep_station:
+        description: '출발역 (예: 수서)'
+        required: true
+        default: '수서'
+      arr_station:
+        description: '도착역 (예: 부산)'
+        required: true
+        default: '부산'
+      date:
+        description: '날짜 YYYYMMDD (예: 20260410)'
+        required: true
+      start_time:
+        description: '시작 시간 HH:MM (예: 13:00)'
+        required: true
+        default: '00:00'
+      end_time:
+        description: '종료 시간 HH:MM (예: 20:00)'
+        required: true
+        default: '23:59'
+      passengers:
+        description: '인원 수 (1~9)'
+        required: true
+        default: '1'
+      seat_type:
+        description: '좌석 유형'
+        required: true
+        default: 'GENERAL_FIRST'
+        type: choice
+        options:
+          - GENERAL_FIRST
+          - SPECIAL_FIRST
+          - GENERAL_ONLY
+          - SPECIAL_ONLY
+      interval_sec:
+        description: '검색 간격 (초, 최소 1)'
+        required: true
+        default: '5'
+
+jobs:
+  book:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330  # 5시간 30분 (GitHub 최대 6시간)
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: |
+          pip install requests
+          pip install git+https://github.com/ryanking13/SRT.git
+
+      - name: SRT 자동 예약 실행
+        env:
+          SRT_ID:       ${{ secrets.SRT_ID }}
+          SRT_PW:       ${{ secrets.SRT_PW }}
+          TG_TOKEN:     ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID:   ${{ secrets.TG_CHAT_ID }}
+          DEP_STATION:  ${{ github.event.inputs.dep_station }}
+          ARR_STATION:  ${{ github.event.inputs.arr_station }}
+          DATE:         ${{ github.event.inputs.date }}
+          START_TIME:   ${{ github.event.inputs.start_time }}
+          END_TIME:     ${{ github.event.inputs.end_time }}
+          PASSENGERS:   ${{ github.event.inputs.passengers }}
+          SEAT_TYPE:    ${{ github.event.inputs.seat_type }}
+          INTERVAL_SEC: ${{ github.event.inputs.interval_sec }}
+          MAX_DURATION_SEC: '19800'  # 5시간 30분
+        run: python srt_runner.py
