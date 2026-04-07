@@ -1,10 +1,10 @@
 {
   "dep_station": "수서",
-  "arr_station": "부산",
+  "arr_station": "울산",
   "date": "20260410",
-  "start_time": "00:00",
-  "end_time": "23:59",
+  "start_time": "12:00",
+  "end_time": "14:00",
   "passengers": 1,
   "seat_type": "GENERAL_FIRST",
-  "interval_sec": 5
+  "interval_sec": 2
 }
