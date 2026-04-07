@@ -41,10 +41,13 @@ on:
         required: true
         default: '5'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   book:
     runs-on: ubuntu-latest
-    timeout-minutes: 330  # 5시간 30분 (GitHub 최대 6시간)
+    timeout-minutes: 330
 
     steps:
       - name: 코드 체크아웃
@@ -57,22 +60,26 @@ jobs:
 
       - name: 의존성 설치
         run: |
+          pip install --upgrade pip
           pip install requests
-          pip install git+https://github.com/ryanking13/SRT.git
+          pip install SRTrain
+
+      - name: SRT 설치 확인
+        run: python -c "from SRT import SRT; print('SRT 라이브러리 OK')"
 
       - name: SRT 자동 예약 실행
         env:
-          SRT_ID:       ${{ secrets.SRT_ID }}
-          SRT_PW:       ${{ secrets.SRT_PW }}
-          TG_TOKEN:     ${{ secrets.TG_TOKEN }}
-          TG_CHAT_ID:   ${{ secrets.TG_CHAT_ID }}
-          DEP_STATION:  ${{ github.event.inputs.dep_station }}
-          ARR_STATION:  ${{ github.event.inputs.arr_station }}
-          DATE:         ${{ github.event.inputs.date }}
-          START_TIME:   ${{ github.event.inputs.start_time }}
-          END_TIME:     ${{ github.event.inputs.end_time }}
-          PASSENGERS:   ${{ github.event.inputs.passengers }}
-          SEAT_TYPE:    ${{ github.event.inputs.seat_type }}
-          INTERVAL_SEC: ${{ github.event.inputs.interval_sec }}
-          MAX_DURATION_SEC: '19800'  # 5시간 30분
+          SRT_ID:           ${{ secrets.SRT_ID }}
+          SRT_PW:           ${{ secrets.SRT_PW }}
+          TG_TOKEN:         ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID:       ${{ secrets.TG_CHAT_ID }}
+          DEP_STATION:      ${{ github.event.inputs.dep_station }}
+          ARR_STATION:      ${{ github.event.inputs.arr_station }}
+          DATE:             ${{ github.event.inputs.date }}
+          START_TIME:       ${{ github.event.inputs.start_time }}
+          END_TIME:         ${{ github.event.inputs.end_time }}
+          PASSENGERS:       ${{ github.event.inputs.passengers }}
+          SEAT_TYPE:        ${{ github.event.inputs.seat_type }}
+          INTERVAL_SEC:     ${{ github.event.inputs.interval_sec }}
+          MAX_DURATION_SEC: '19800'
         run: python srt_runner.py
